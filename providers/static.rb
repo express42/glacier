@@ -4,6 +4,8 @@ action :backup do
       package pkg
   end
 
+  python_pip "git+git://github.com/uskudnik/amazon-glacier-cmd-interface.git"
+
   directory "/etc/glacier" do
     recursive true
     mode 0750

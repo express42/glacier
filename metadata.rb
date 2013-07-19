@@ -1,0 +1,7 @@
+maintainer        "LLC Express 42"
+maintainer_email  "info@express42.com"
+license           "MIT"
+description       "Configures glacier backup"
+version           "0.1.0"
+depends           "crontab"
+depends           "python", "1.3.4"

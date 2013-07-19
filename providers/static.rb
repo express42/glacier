@@ -99,7 +99,7 @@ action :backup do
 
   _new_resource = new_resource
 
-  crontab _new_resource.name do
+  crontab "glacier #{_new_resource.name}" do
     command "/usr/bin/flock -n /tmp/glacier_backup_static_#{_new_resource.name}.lock /usr/bin/envdir /etc/glacier/#{_new_resource.name}/env /opt/chef/backups/glacier_backup_static.sh"
     minute _new_resource.time[:minute]
     hour _new_resource.time[:hour]

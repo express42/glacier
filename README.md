@@ -82,6 +82,7 @@ glacier_static LWRP creates tasks for backuping static content. All cron tasks a
     <td>Incremental or full backup (boolean)</td>
     <td>false</td>
   </tr>
+</table>
 
 ### Examples
 ```ruby

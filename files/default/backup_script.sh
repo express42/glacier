@@ -17,6 +17,6 @@ mkdir -p $BACKUP_TEMPDIR/$date
 cd $BACKUP_TEMPDIR/$date
 [ "$BACKUP_TYPE" == "Full" ] && rm -f $BACKUP_TEMPDIR/backup-inc-file.list
 
-ionice -n 7 tar czf backup.tar.gz $BACKUP_PATH --listed-incremental=$BACKUP_TEMPDIR/backup-inc-file.list >> $BACKUP_TEMPDIR/glacier_static.log 2>&1
-/usr/local/bin/glacier-cmd -c $BACKUP_GLACIER_CONFIG upload --name "backup-$date.tar.gz" --description "backup at $date from $hostn, $timestamp" $BACKUP_GLACIER_VAULT backup.tar.gz >> $BACKUP_TEMPDIR/glacier_static.log 2>&1
+ionice -n 7 tar cz $BACKUP_PATH --listed-incremental=$BACKUP_TEMPDIR/backup-inc-file.list | split -d -b 5368709120 - Backup_${hostn}_${clearpath}_${timestamp}_${BACKUP_TYPE}.tar.gz. >> $BACKUP_TEMPDIR/s3static.log 2>&1
+/usr/local/bin/glacier-cmd -c $BACKUP_GLACIER_CONFIG upload --name "backup-$date.tar.gz" --description "backup at $date from $hostn, $timestamp" $BACKUP_GLACIER_VAULT * >> $BACKUP_TEMPDIR/glacier_static.log 2>&1
 rm -f $BACKUP_TEMPDIR/$date/*

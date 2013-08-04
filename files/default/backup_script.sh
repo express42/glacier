@@ -22,8 +22,8 @@ echo "Starting $BACKUP_TYPE backup at $timestamp" >> $BACKUP_TEMPDIR/glacier_sta
 ionice -n 7 tar cz $BACKUP_PATH --listed-incremental=$BACKUP_TEMPDIR/backup-inc-file.list | split -d -b 5368709120 - Backup_${hostn}_${clearpath}_${timestamp}_${BACKUP_TYPE}.tar.gz. >> $BACKUP_TEMPDIR/glacier_static.log 2>&1
 
 for file in $BACKUP_TEMPDIR/$date/*; do
-	/usr/local/bin/glacier-cmd -c $BACKUP_GLACIER_CONFIG upload \
-		--description "$file, backup at $date from $hostn, $timestamp" $BACKUP_GLACIER_VAULT $file >> $BACKUP_TEMPDIR/glacier_static.log 2>&1
+	(/usr/local/bin/glacier-cmd -c $BACKUP_GLACIER_CONFIG upload \
+		--description "$file, backup at $date from $hostn, $timestamp" $BACKUP_GLACIER_VAULT $file >> $BACKUP_TEMPDIR/glacier_static.log 2>&1)&
 done
 
 # let's get inventory at end of backup

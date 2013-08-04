@@ -10,13 +10,20 @@
 set -e
 
 date=$(date +%F)
-timestamp=$(date +%s)
+timestamp=$(date +"%Y-%m-%d_%H:%M")
 hostn=$(hostname -f)
 clearpath=`echo $BACKUP_PATH | sed s@/@-@g`
 mkdir -p $BACKUP_TEMPDIR/$date
 cd $BACKUP_TEMPDIR/$date
 [ "$BACKUP_TYPE" == "Full" ] && rm -f $BACKUP_TEMPDIR/backup-inc-file.list
 
-ionice -n 7 tar cz $BACKUP_PATH --listed-incremental=$BACKUP_TEMPDIR/backup-inc-file.list | split -d -b 5368709120 - Backup_${hostn}_${clearpath}_${timestamp}_${BACKUP_TYPE}.tar.gz. >> $BACKUP_TEMPDIR/s3static.log 2>&1
-/usr/local/bin/glacier-cmd -c $BACKUP_GLACIER_CONFIG upload --name "backup-$date.tar.gz" --description "backup at $date from $hostn, $timestamp" $BACKUP_GLACIER_VAULT * >> $BACKUP_TEMPDIR/glacier_static.log 2>&1
+echo "Starting $BACKUP_TYPE backup at $timestamp" >> $BACKUP_TEMPDIR/glacier_static.log
+
+ionice -n 7 tar cz $BACKUP_PATH --listed-incremental=$BACKUP_TEMPDIR/backup-inc-file.list | split -d -b 5368709120 - Backup_${hostn}_${clearpath}_${timestamp}_${BACKUP_TYPE}.tar.gz. >> $BACKUP_TEMPDIR/glacier_static.log 2>&1
+
+for file in $BACKUP_TEMPDIR/$date/* do
+	/usr/local/bin/glacier-cmd -c $BACKUP_GLACIER_CONFIG upload \
+		--description "$file, backup at $date from $hostn, $timestamp" $BACKUP_GLACIER_VAULT $file >> $BACKUP_TEMPDIR/glacier_static.log 2>&1
+done
+
 rm -f $BACKUP_TEMPDIR/$date/*

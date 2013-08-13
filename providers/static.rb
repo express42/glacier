@@ -54,39 +54,19 @@ action :backup do
              )
   end
 
-  file "/etc/glacier/#{new_resource.name}/env/BACKUP_TEMPDIR" do
-    mode 0640
-    owner "root"
-    group "root"
-    content new_resource.tempdir
-  end
-
-  file "/etc/glacier/#{new_resource.name}/env/BACKUP_PATH" do
-    mode 0640
-    owner "root"
-    group "root"
-    content new_resource.path
-  end
-
-  file "/etc/glacier/#{new_resource.name}/env/BACKUP_GLACIER_VAULT" do
-    mode 0640
-    owner "root"
-    group "root"
-    content new_resource.vault
-  end
-
-  file "/etc/glacier/#{new_resource.name}/env/BACKUP_GLACIER_CONFIG" do
-    mode 0640
-    owner "root"
-    group "root"
-    content "/etc/glacier/#{new_resource.name}/glacier-cmd.conf"
-  end
-
-  file "/etc/glacier/#{new_resource.name}/env/BACKUP_TYPE" do
-    mode 0640
-    owner "root"
-    group "root"
-    content new_resource.full ? "Full" : "Incremental"
+  {
+    "/etc/glacier/#{new_resource.name}/env/BACKUP_TEMPDIR" => new_resource.tempdir,
+    "/etc/glacier/#{new_resource.name}/env/BACKUP_PATH" => new_resource.path,
+    "/etc/glacier/#{new_resource.name}/env/BACKUP_GLACIER_VAULT" => new_resource.vault,
+    "/etc/glacier/#{new_resource.name}/env/BACKUP_GLACIER_CONFIG" => "/etc/glacier/#{new_resource.name}/glacier-cmd.conf",
+    "/etc/glacier/#{new_resource.name}/env/BACKUP_TYPE" => (new_resource.full ? "Full" : "Incremental")
+  }.each do |path, _content|
+    file path do
+      mode 0640
+      owner "root"
+      group "root"
+      content _content
+    end
   end
 
   cookbook_file "/opt/chef/backups/glacier_backup_static.sh" do
